@@ -21,6 +21,8 @@
 .route-link:hover svg, .route-link:focus-visible svg, .text-link:hover svg, .nav-contact:hover svg, .market-stack a:hover svg { transform: translate(2px,-2px); }
 .pill-link:hover .pill-arrow svg, .pill-link:focus-visible .pill-arrow svg { transform: rotate(45deg); }
 .pill-link:active, .giant-arrow:active { filter: brightness(.94); }
+.giant-arrow { transition: transform .25s, rotate .25s; }
+.giant-arrow:hover { rotate: 45deg; }
 .service-entry > button .service-title { transition: color .25s; }
 :is(.service-entry,.journey-timeline,.legal-item) button > svg { transition: transform .28s cubic-bezier(.22,1,.36,1); }
 :is(.service-entry,.journey-timeline,.legal-item) button:hover { color: var(--lime); }
@@ -43,6 +45,7 @@
 @keyframes grid-arrival { from { opacity: .3; } to { opacity: 1; } }
 @media (hover: none), (pointer: coarse) {
   .pill-link:hover, .giant-arrow:hover { transform: none; }
+  .giant-arrow:hover { rotate: none; }
   .interactive-report svg { cursor: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -51,6 +54,7 @@
   .hero-line { overflow: visible; }
   .route-link:hover svg, .route-link:focus-visible svg, .text-link:hover svg, .nav-contact:hover svg, .market-stack a:hover svg,
   .pill-link:hover, .pill-link:hover .pill-arrow svg, .pill-link:focus-visible .pill-arrow svg, .giant-arrow:hover, .form-submit:active, .line-cta:hover svg { transform: none; }
+  .giant-arrow:hover { rotate: none; }
 }
 
 .editorial-mask { display: block; overflow: clip; overflow-clip-margin: .06em; }
