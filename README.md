@@ -31,7 +31,9 @@ Client-side routing uses the History API without a routing dependency. On static
 - Reporting lab with explicitly synthetic index/peak-distance views, observation scrubber and accessible data table
 - Reporting status and standards tabs
 - Legal disclosure accordion
-- Contact form validation and **prototype-only confirmation; no data is sent or stored**
+- Contact validation, preview confirmation and optional public-endpoint delivery with explicit acceptance/error states
+- A validated four-step onboarding enquiry with review and confirmation
+- Report-window filtering, synchronized chart/table inspection and synthetic CSV downloads
 
 ## Launch blockers / information to verify
 
@@ -76,3 +78,9 @@ NODE_PATH=/tmp/tradeborn-checks/node_modules node scripts/verify-motion.cjs
 ```
 
 These checks cover all ten pages with motion enabled and reduced at mobile and desktop sizes, finite animations, stable hero dimensions, cumulative layout shift, mouse/touch chart inspection, disclosure exits, keyboard controls and history/fragment restoration.
+
+## Enquiry delivery
+
+Contact and Onboarding default to preview mode. To enable delivery, configure the public `VITE_CONTACT_ENDPOINT` before building. Never place private credentials in frontend variables. The endpoint must validate and rate-limit requests, deduplicate `submissionId` and return JSON `{ "ok": true }` after acceptance. The UI does not claim email delivery or account creation.
+
+See [INTEGRATIONS.md](INTEGRATIONS.md) for the exact contract, required service-side controls, privacy prerequisites and the isolated integration-test workflow. No real endpoint or client destination has been configured or verified here.

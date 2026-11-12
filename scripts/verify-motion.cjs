@@ -1,6 +1,7 @@
 /* Input-driven motion checks. Uses the same optional Playwright installation as verify-browser.cjs. */
 const assert = require('node:assert/strict')
 const { chromium } = require('playwright')
+const {fillContact,reviewOnboarding}=require('./form-test-helpers.cjs')
 const base = process.env.BASE_URL || 'http://127.0.0.1:4173'
 const routes = ['/', '/about', '/approach', '/services', '/markets', '/performance', '/risk', '/onboarding', '/contact', '/legal']
 async function run() {
@@ -70,9 +71,9 @@ async function run() {
     assert.equal(await p.locator('.lab-readout > strong').textContent(),'-2')
     await p.locator('input[type=range]').focus();await p.keyboard.press('ArrowRight');assert.match(await p.locator('.chart-scrubber output').textContent(),/04/)
     await p.goto(base+'/risk');await p.getByRole('tab',{name:'Liquidity shock',exact:true}).click();await settle();assert.equal(await p.locator('#scenario-panel').count(),1)
-    await p.goto(base+'/onboarding');await p.locator('.journey-timeline button').nth(2).click();await settle();assert.equal(await p.locator('#journey-2 dd').count(),2)
+    await p.goto(base+'/onboarding');await reviewOnboarding(p);await settle();assert.equal(await p.locator('#journey-2 dd').count(),6)
     await p.goto(base+'/legal');const disclosure=p.locator('.legal-item > button').nth(2);await disclosure.click();await settle();await disclosure.click();await p.locator('#legal-panel-2').waitFor({state:'detached'})
-    await p.goto(base+'/contact');await p.locator('#fullName').fill('Motion check');await p.locator('#email').fill('motion@example.com');await p.locator('#message').fill('Preview validation only.');await p.getByRole('button',{name:'Validate preview'}).click();await settle();assert.equal(await p.locator('.form-notice').count(),1)
+    await p.goto(base+'/contact');await fillContact(p);await p.getByRole('button',{name:'Validate preview'}).click();await settle();assert.equal(await p.locator('.form-notice').count(),1)
     await p.getByRole('button',{name:'Dismiss notice'}).click();await p.locator('.form-notice').waitFor({state:'detached'})
     // SPA anchors, direct URLs, history scroll restoration, single active page and keyboard focus.
     await p.goto(base+'/approach');await settle();await p.evaluate(()=>window.scrollTo({top:500,behavior:'instant'}));await settle()

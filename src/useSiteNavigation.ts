@@ -33,7 +33,9 @@ export function useSiteNavigation() {
     destination.current = null
     document.getElementById('main')?.focus({ preventScroll: true })
     if (typeof target === 'string') {
-      document.getElementById(decodeURIComponent(target.slice(1)))?.scrollIntoView({ behavior: 'instant' })
+      let id=target.slice(1)
+      try { id=decodeURIComponent(id) } catch { /* An invalid fragment must not break navigation. */ }
+      document.getElementById(id)?.scrollIntoView({ behavior: 'instant' })
     } else window.scrollTo({ top: target, behavior: 'instant' })
   }, [route])
 

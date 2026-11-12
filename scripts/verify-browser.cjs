@@ -1,6 +1,7 @@
 /* Run against npm run preview. See VERIFY.md for the optional Playwright runner. */
 const assert = require('node:assert/strict')
 const { chromium } = require('playwright')
+const {fillContact,reviewOnboarding}=require('./form-test-helpers.cjs')
 const base = process.env.BASE_URL || 'http://127.0.0.1:4173'
 const routes = ['/', '/about', '/approach', '/services', '/markets', '/performance', '/risk', '/onboarding', '/contact', '/legal']
 const navigation = { About: '/about', Approach: '/approach', Services: '/services', Markets: '/markets', Reports: '/performance', Risk: '/risk', Onboarding: '/onboarding', Contact: '/contact', Legal: '/legal' }
@@ -17,7 +18,11 @@ async function run() {
   const page = await browser.newPage({ reducedMotion: 'reduce' })
   const errors = [], failures = [], links = new Set()
   page.on('pageerror', e => errors.push(e.message))
-  page.on('requestfailed', r => failures.push(r.url()))
+  page.on('requestfailed', r => {
+    // Chromium may cancel an asynchronous favicon load when the next route is opened.
+    if(r.failure()?.errorText==='net::ERR_ABORTED' && new URL(r.url()).pathname==='/favicon.svg')return
+    failures.push(r.url())
+  })
   const visit = async path => {
     const response = await page.goto(base + path)
     assert.equal(response.status(), 200, path)
@@ -126,11 +131,14 @@ async function run() {
       assert.equal(await page.locator('#scenario-panel').getAttribute('aria-labelledby'),id)
     }
     await visit('/onboarding')
-    for(let i=0;i<4;i++) {
-      await page.locator('.journey-timeline button').nth(i).click()
-      assert.equal(await page.locator(`#journey-${i} dd`).count(),2)
-      await checkLayout('Onboarding '+i)
-    }
+    await checkLayout('Onboarding details')
+    await reviewOnboarding(page)
+    assert.equal(await page.locator('.enquiry-review dd').count(),6)
+    await checkLayout('Onboarding review')
+    await page.locator('#onboarding-acknowledgement').check()
+    await page.getByRole('button',{name:'Confirm preview',exact:true}).click()
+    await page.getByRole('heading',{name:'Preview complete.',exact:true}).waitFor()
+    await checkLayout('Onboarding confirmation')
     await visit('/legal')
     for (const button of await page.locator('.legal-item > button').all()) {
       if(await button.getAttribute('aria-expanded')!=='true')await button.click()
@@ -139,7 +147,7 @@ async function run() {
     }
     await visit('/contact')
     await page.getByRole('button',{name:'Validate preview'}).click();assert.equal(await page.locator('.form-notice').count(),0)
-    await page.locator('#fullName').fill('Preview User');await page.locator('#email').fill('preview@example.com');await page.locator('#message').fill('A test enquiry about the proposed scope.')
+    await fillContact(page)
     let submissions=0
     const request=r=>{if(r.method()==='POST')submissions++}
     page.on('request',request)

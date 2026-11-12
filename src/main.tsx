@@ -9,5 +9,6 @@ import '@fontsource/dm-mono/latin-500.css'
 import './styles.css'
 import './refinements.css'
 import './motion.css'
+import './features.css'
 
 createRoot(document.getElementById('root')!).render(<React.StrictMode><MotionConfig reducedMotion="user"><App /></MotionConfig></React.StrictMode>)
