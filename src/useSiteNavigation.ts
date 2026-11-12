@@ -9,7 +9,7 @@ export function useSiteNavigation() {
   const [route, setRoute] = useState(() => ({ url: currentUrl(), key: history.state?.tbMotionKey || newKey() }))
   const entry = useRef(route.key)
   const positions = useRef(new Map<string, number>())
-  const destination = useRef<number | string | null>(null)
+  const destination = useRef<number | string | null>(location.hash || null)
 
   useEffect(() => {
     history.replaceState({ ...history.state, tbMotionKey: entry.current }, '', currentUrl())

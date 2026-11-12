@@ -2,29 +2,15 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion, useIsPresent, useReducedMotion } from 'motion/react'
 import { ArrowDown, ArrowUpRight, Check, CircleHelp, Crosshair, FileText, Menu, Plus, ShieldCheck, SlidersHorizontal, X } from 'lucide-react'
 
-import { AboutDossier, ContactDetails, HomeIndex, IdentityPlate, InstrumentDesk, JourneyTimeline, LegalRegister, MethodWorkbench, PrivacyNote, ReportingLab, RiskConsole, ServiceExplorer, moveTab } from './Editorial'
+import { AboutDossier, ContactDetails, HomeIndex, IdentityPlate, InstrumentDesk, JourneyTimeline, LegalRegister, MethodWorkbench, PrivacyNote, RiskConsole, ServiceExplorer, moveTab } from './Editorial'
 
 import { Collapse, DrawPath, HeroLine, MagneticButton, MaskedText, editorialEase } from './Motion'
 import { useSiteNavigation } from './useSiteNavigation'
+import { routes, pathFor, routeFor, type PageKey } from './routes'
+import { usePageMetadata } from './metadata'
 import { ContactForm } from './EnquiryForms'
+import { ReportingLab } from './ReportingLab'
 import { contactDelivery } from './contactConfig'
-
-type PageKey = 'home' | 'about' | 'approach' | 'services' | 'markets' | 'performance' | 'risk' | 'onboarding' | 'contact' | 'legal' | 'not-found'
-type Route = { key: PageKey; label: string; path: string }
-const routes: Route[] = [
-  { key: 'home', label: 'Home', path: '/' },
-  { key: 'about', label: 'About', path: '/about' },
-  { key: 'approach', label: 'Approach', path: '/approach' },
-  { key: 'services', label: 'Services', path: '/services' },
-  { key: 'markets', label: 'Markets', path: '/markets' },
-  { key: 'performance', label: 'Reports', path: '/performance' },
-  { key: 'risk', label: 'Risk', path: '/risk' },
-  { key: 'onboarding', label: 'Onboarding', path: '/onboarding' },
-  { key: 'contact', label: 'Contact', path: '/contact' },
-  { key: 'legal', label: 'Legal', path: '/legal' },
-]
-const pathFor = (key: PageKey) => routes.find(route => route.key === key)?.path ?? '/'
-const routeFor = (path: string): PageKey => routes.find(route => route.path === path.replace(/\/$/, '') || (route.path === '/' && path === '/'))?.key ?? 'not-found'
 
 function Wordmark({ onClick }: { onClick: () => void }) {
   return <button className="wordmark" onClick={onClick} aria-label="Trade Born home"><span className="brand-mark"><span /><span /><span /></span><span>TRADE{' '}<span className="brand-light">BORN</span><span className="brand-dot">.</span></span></button>
@@ -38,12 +24,12 @@ function Reveal({ children, className = '', delay = 0 }: { children: ReactNode; 
 }
 function Eyebrow({ index, children, dark = false }: { index?: string; children: ReactNode; dark?: boolean }) { return <div className={`eyebrow ${dark ? 'eyebrow-dark' : ''}`}><span className="eyebrow-glyph">✳</span>{index && <span>{index} /</span>}{children}</div> }
 function PageIntro({ number, category, title, accent, description }: { number: string; category: string; title: string; accent?: string; description: string }) {
-  return <section className={`interior-hero shell intro-${number}`}><Reveal><Eyebrow index={number}>{category}</Eyebrow><h1>{title}{accent && <>{' '}<em>{accent}</em></>}</h1><p>{description}</p></Reveal><IdentityPlate number={number}/><span className="intro-index">TB—{number}</span></section>
+  return <section className={`interior-hero shell intro-${number}`}><Reveal><Eyebrow index={number}>{category}</Eyebrow><h1>{title}{accent && <>{' '}<em>{accent}</em></>}</h1><p>{description}</p></Reveal><IdentityPlate number={number}/></section>
 }
 function SectionHeader({ count, kicker, title, sub }: { count: string; kicker: string; title: ReactNode; sub?: string }) { return <div className="section-head"><Reveal><Eyebrow index={count}>{kicker}</Eyebrow><h2><MaskedText>{title}</MaskedText></h2></Reveal>{sub && <Reveal delay={.12}><p className="section-aside">{sub}</p></Reveal>}</div> }
 function LineCTA({ children, onClick }: { children: ReactNode; onClick: () => void }) { return <button className="line-cta" onClick={onClick}><span>{children}</span><ArrowUpRight size={22}/></button> }
 
-function MarketCanvas({ compact = false }: { compact?: boolean }) {
+function MarketCanvas() {
   const reduced=useReducedMotion()
   const [pointer, setPointer] = useState<number | null>(null)
   const columns = 45
@@ -54,11 +40,11 @@ function MarketCanvas({ compact = false }: { compact?: boolean }) {
     return Math.max(7, Math.min(80, trend + wave))
   })
   const path = values.map((y, i) => `${i ? 'L' : 'M'} ${(i / (columns - 1)) * 800} ${y * 3.5}`).join(' ')
-  return <div className={`market-canvas ${compact ? 'market-compact' : ''}`} onPointerLeave={() => setPointer(null)} onPointerMove={e => { const bounds = e.currentTarget.getBoundingClientRect(); setPointer(Math.min(columns - 1, Math.max(0, Math.round(((e.clientX - bounds.left) / bounds.width) * (columns - 1))))) }}>
+  return <div className="market-canvas" onPointerLeave={() => setPointer(null)} onPointerMove={e => { const bounds = e.currentTarget.getBoundingClientRect(); setPointer(Math.min(columns - 1, Math.max(0, Math.round(((e.clientX - bounds.left) / bounds.width) * (columns - 1))))) }}>
     <div className="canvas-top"><span><span className="live-square"/> MARKET STRUCTURE / VISUAL STUDY</span><span>FIG. 01 — SCHEMATIC</span></div>
     <svg viewBox="0 0 800 320" preserveAspectRatio="none" role="img" aria-label="Abstract illustrative price structure line chart; not actual market or performance data">
-      <defs><pattern id={compact ? 'grid-small' : 'grid-large'} width="80" height="53" patternUnits="userSpaceOnUse"><path d="M 80 0 L 0 0 0 53" fill="none" stroke="#36402e" strokeWidth=".7"/></pattern></defs>
-      <motion.rect width="800" height="320" fill={`url(#${compact ? 'grid-small' : 'grid-large'})`} initial={reduced?false:{opacity:.3}} whileInView={{opacity:1}} viewport={{once:true}} transition={{duration:reduced?0:1}}/>
+      <defs><pattern id="grid-large" width="80" height="53" patternUnits="userSpaceOnUse"><path d="M 80 0 L 0 0 0 53" fill="none" stroke="#36402e" strokeWidth=".7"/></pattern></defs>
+      <motion.rect width="800" height="320" fill="url(#grid-large)" initial={reduced?false:{opacity:.3}} whileInView={{opacity:1}} viewport={{once:true}} transition={{duration:reduced?0:1}}/>
       <DrawPath d={path} fill="none" stroke="#c3fa68" strokeWidth="2.2" vectorEffect="non-scaling-stroke" />
       <path d={`${path} L 800 320 L 0 320 Z`} fill="#c3fa68" fillOpacity=".025" />
       <line x1="0" y1="208" x2="800" y2="208" stroke="#b9e87c" strokeDasharray="4 8" strokeOpacity=".3" />
@@ -137,7 +123,7 @@ function App() {
     media.addEventListener('change',closeOnDesktop)
     return ()=>media.removeEventListener('change',closeOnDesktop)
   },[])
-  useEffect(()=>{document.title=`${routes.find(r=>r.key===page)?.label ?? 'Page not found'} — Trade Born`},[page])
+  usePageMetadata(page)
   return <div className="site" onClick={interceptLink}><a className="skip-link" href="#main">Skip to content</a><motion.header className={`site-header ${scrolled?'scrolled':''}`} initial={reduced?false:{opacity:0}} animate={{opacity:1}} transition={{duration:reduced?0:.45}}><div className="shell nav-shell"><Wordmark onClick={()=>go('home')}/><nav className="desktop-nav" aria-label="Main navigation">{(['about','approach','services','markets','performance'] as PageKey[]).map(k=><button key={k} aria-current={page===k?'page':undefined} onClick={()=>go(k)}>{routes.find(r=>r.key===k)?.label}{page===k&&<motion.span className="nav-active-indicator" layoutId="nav-active" transition={{duration:reduced?0:.28,ease:editorialEase}}/>}</button>)}</nav><div className="nav-end"><button className="nav-contact" onClick={()=>go('contact')}>LET'S TALK <ArrowUpRight size={16}/></button><button className="menu-button" aria-label={menuOpen?'Close menu':'Open menu'} aria-expanded={menuOpen} onClick={()=>setMenuOpen(!menuOpen)}>{menuOpen?<X size={23}/>:<Menu size={23}/>}</button></div></div></motion.header><AnimatePresence>{menuOpen&&<MobileMenu key="mobile-navigation" go={go}/>}</AnimatePresence><motion.main initial={reduced?false:{opacity:.45}} animate={{opacity:1}} transition={{duration:reduced?0:.3,ease:editorialEase}} id="main" className={`page-${page}`} tabIndex={-1} key={route.key}>{pageView[page]}</motion.main><Footer go={go}/></div>
 }
 export default App

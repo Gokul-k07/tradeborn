@@ -23,6 +23,11 @@ async function run() {
     if(r.failure()?.errorText==='net::ERR_ABORTED' && new URL(r.url()).pathname==='/favicon.svg')return
     failures.push(r.url())
   })
+  const waitForFeature = async () => {
+    const pathname=new URL(page.url()).pathname
+    const selector={'/contact':'.contact-form','/onboarding':'.journey-enquiry','/performance':'.reporting-lab'}[pathname]
+    if(selector)await page.locator(selector).waitFor({state:'visible'})
+  }
   const visit = async path => {
     const response = await page.goto(base + path)
     assert.equal(response.status(), 200, path)
@@ -31,6 +36,7 @@ async function run() {
     assert.equal(await page.locator('.page-not-found').count(), 0, path)
     const expected=new URL(path,base).pathname.replace(/\/$/,'').slice(1)||'home'
     assert.equal(await page.locator('main').getAttribute('class'),'page-'+expected)
+    await waitForFeature()
   }
   const checkLayout = async label => {
     const problems = await page.evaluate(() => {
@@ -65,22 +71,22 @@ async function run() {
     for (const name of buttons.filter(n => ctas[n])) {
       await visit(route)
       await page.getByRole('button', { name, exact: true }).click()
-      assert.equal(new URL(page.url()).pathname, ctas[name], name)
+      assert.equal(new URL(page.url()).pathname, ctas[name], name);await waitForFeature()
       assert.equal(await page.locator('main:focus').count(), 1, 'Focus follows navigation')
       checkedCtas++
     }
     for (const [name, path] of Object.entries(navigation)) {
       await visit(route)
       await page.locator('.footer-nav').getByRole('button', { name, exact: true }).click()
-      assert.equal(new URL(page.url()).pathname, path)
+      assert.equal(new URL(page.url()).pathname, path);await waitForFeature()
     }
     for (const [name, path] of Object.entries(navigation).slice(0,5)) {
       await visit(route)
       await page.locator('.desktop-nav').getByRole('button', { name, exact: true }).click()
-      assert.equal(new URL(page.url()).pathname, path)
+      assert.equal(new URL(page.url()).pathname, path);await waitForFeature()
     }
-    await visit(route); await page.locator('.nav-contact').click(); assert.equal(new URL(page.url()).pathname, '/contact')
-    await visit(route); await page.locator('header .wordmark').click(); assert.equal(new URL(page.url()).pathname, '/')
+    await visit(route); await page.locator('.nav-contact').click(); assert.equal(new URL(page.url()).pathname, '/contact');await waitForFeature()
+    await visit(route); await page.locator('header .wordmark').click(); assert.equal(new URL(page.url()).pathname, '/');await waitForFeature()
   }
   console.log(`PASS ${checkedCtas} main CTAs, 140 desktop/footer routes, contact and home buttons`)
   for (const width of [320, 1440]) {
@@ -163,7 +169,7 @@ async function run() {
     await page.getByRole('button',{name:'Open menu'}).click()
     await page.locator('.mobile-menu button').first().waitFor({state:'visible'})
     await page.locator('.mobile-menu').getByRole('button',{name:new RegExp(name+'$')}).click()
-    assert.equal(new URL(page.url()).pathname,path)
+    assert.equal(new URL(page.url()).pathname,path);await waitForFeature()
     await page.locator('.mobile-menu').waitFor({state:'detached'})
     assert.notEqual(await page.evaluate(()=>document.body.style.overflow),'hidden')
   }

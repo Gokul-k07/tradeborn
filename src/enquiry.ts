@@ -1,5 +1,4 @@
 export const enquiryTopics = ['General enquiry', 'Trading approach', 'Services and eligibility', 'Reporting and disclosures', 'Other'] as const
-export type EnquiryTopic = typeof enquiryTopics[number]
 export type Enquiry = { name: string; email: string; company: string; topic: string; subject: string; message: string }
 export type EnquiryErrors = Partial<Record<keyof Enquiry, string>>
 export const emptyEnquiry: Enquiry = { name: '', email: '', company: '', topic: 'General enquiry', subject: '', message: '' }

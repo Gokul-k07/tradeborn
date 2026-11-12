@@ -16,7 +16,6 @@ main:focus { outline: none; }
 .identity-plate { display: grid; grid-template-columns: 28px 1fr 1fr auto; align-items: center; gap: 24px; border-top: 1px solid var(--line); padding-top: 22px; margin-top: 55px; font-size: 13px; color: #a8b3a2; }
 .precision-cross { color: var(--lime); font: 26px var(--mono); }
 .plate-code { font: 11px var(--mono); color: var(--lime); }
-.intro-index { display: none; }
 .intro-01 h1 { max-width: 1050px; }
 .intro-02 { background: radial-gradient(ellipse at 95% 40%,#1b271540,transparent 55%); }
 .intro-03 h1 { max-width: 1250px; }

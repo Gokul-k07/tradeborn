@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { deliverEnquiry } from './enquiryDelivery'
-import type { Enquiry } from './enquiry'
+import { contactDelivery } from './contactConfig'
+import { validateEnquiry, type Enquiry } from './enquiry'
 
 export type DeliveryState = { status: 'idle' | 'sending' | 'preview' | 'accepted' | 'error'; message: string }
 const idle: DeliveryState = { status: 'idle', message: '' }
@@ -19,6 +19,7 @@ export function useEnquiryDelivery(source: 'contact' | 'onboarding') {
   }
   const submit = async (data: Enquiry, website: string) => {
     if (busy.current || accepted.current) return null
+    if (Object.keys(validateEnquiry(data)).length) { setState({ status: 'error', message: 'Please check the enquiry details before submitting.' }); return null }
     if (website) { setState({ status: 'error', message: 'The enquiry could not be validated. Please reload the page and try again.' }); return null }
     busy.current = true
     const value = JSON.stringify(data)
@@ -28,7 +29,9 @@ export function useEnquiryDelivery(source: 'contact' | 'onboarding') {
     const timeout = window.setTimeout(() => request.abort(), 12000)
     setState({ status: 'sending', message: 'Submitting the enquiry. Please keep this page open.' })
     try {
-      const result = await deliverEnquiry(data, source, submission.current.id, request.signal)
+      const result = contactDelivery.endpoint
+        ? await (await import('./enquiryDelivery')).deliverEnquiry(data, source, submission.current.id, request.signal)
+        : { status: 'preview' as const }
       if (!alive.current) return null
       accepted.current = true
       setState(result.status === 'preview'

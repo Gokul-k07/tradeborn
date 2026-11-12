@@ -6,7 +6,7 @@ import { Collapse, DrawPath, StorySection, SwapPanel } from './Motion'
 
 import { OnboardingEnquiry } from './EnquiryForms'
 import { contactDelivery } from './contactConfig'
-export { ReportingLab } from './ReportingLab'
+
 
 export function RouteLink({ href, children }: { href: string; children: React.ReactNode }) {
   return <a className="route-link" href={href}>{children}<ArrowUpRight size={18} aria-hidden="true" /></a>

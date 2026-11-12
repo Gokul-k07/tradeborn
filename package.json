@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
-    "preview": "vite preview --host 0.0.0.0"
+    "preview": "vite preview --host 0.0.0.0",
+    "typecheck": "tsc -b",
+    "check:data": "node scripts/verify-data.cjs",
+    "check:production": "node scripts/verify-production.cjs"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",
@@ -23,5 +26,8 @@
     "@vitejs/plugin-react": "^4.4.1",
     "typescript": "~5.6.2",
     "vite": "^6.0.0"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }

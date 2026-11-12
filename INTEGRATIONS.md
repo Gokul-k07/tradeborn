@@ -73,3 +73,17 @@ The additional bundle lives outside the checkout and points only to a local test
 ## Report data
 
 The report window, view buttons, range control, tooltips and table all use the same synthetic series. Window filters select observations without resetting the full-series running maximum used for peak-distance calculations. The downloadable CSV contains only those currently visible observations, with a synthetic-data marker on every row. No personal input is included in downloads and no backend is involved.
+
+## Vercel production configuration
+
+Use the repository-root Vite project with Node 24.x, installation `npm ci`, build `npm run build` and output `dist`. These values are supplied by package.json/.nvmrc and vercel.json; README.md contains the complete import and post-deployment checklist.
+
+No environment variable is required for the preview-mode site. Add `VITE_CONTACT_ENDPOINT` only to the intended Vercel environments after the destination and service controls have been verified. Configure provider-side CORS for the actual allowed site origins; preview deployment hostnames may differ from the production/custom domain. Keep private provider credentials outside Vercel frontend variables and browser bundles.
+
+A same-origin path is supported by the adapter only when a real endpoint is separately supplied. This static repository intentionally has no serverless `/api/enquiry` handler. The Vercel SPA fallback excludes `/api/*`, so an absent handler returns 404 rather than an HTML success response. Using a separately hosted public HTTPS enquiry service is sufficient; no backend should be added merely to deploy the site.
+
+`VITE_SITE_URL` is an optional public canonical HTTPS origin. Otherwise the build uses Vercel's `VERCEL_PROJECT_PRODUCTION_URL` when available. Neither is a delivery credential. Canonical URLs, Open Graph image URLs and an optional sitemap use this origin. Rebuild after a domain or public-variable change, and verify the output on the actual deployed URL.
+
+Page UI stays eager to preserve layout stability. Only the optional delivery adapter is loaded when submitting to a configured endpoint; its load time is included in the existing timeout and failures remain unconfirmed rather than reporting success.
+
+The final local tests cover the static build, public metadata/assets, routing policy, synthetic data, form validation, in-flight guards, errors and local JSON acknowledgements. They do not establish Vercel-account authorization, a successful deployment, external provider CORS/abuse settings or real email receipt. No Vercel credentials were assumed or used. After an authorized deployment, run the read-only URL checks from README.md, then have the owner verify any live delivery using an approved test enquiry and confirmed recipient.
