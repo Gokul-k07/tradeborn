@@ -24,7 +24,12 @@ Client-side routing uses the History API without a routing dependency. On static
 - Responsive mobile menu and navigation
 - Scroll-based entrance animations with reduced-motion support
 - Pointer-responsive abstract market structure illustration; explicitly **not live market data**
-- Accessible market selector tabs and reporting tabs
+- Keyboard-accessible instrument desk with selection deep links (`/markets?instrument=options`)
+- Five-stage research-to-review methodology workbench
+- Expandable service scope explorer and proposed onboarding timeline
+- Risk architecture diagram and interactive adverse-scenario studies
+- Reporting lab with explicitly synthetic index/peak-distance views, observation scrubber and accessible data table
+- Reporting status and standards tabs
 - Legal disclosure accordion
 - Contact form validation and **prototype-only confirmation; no data is sent or stored**
 
@@ -42,3 +47,32 @@ Client-side routing uses the History API without a routing dependency. On static
 ## Deployment
 
 Free-tier static hosting such as Netlify, Vercel or Cloudflare Pages is suitable. Build command: `npm run build`; publish directory: `dist`.
+
+## Browser regression checks
+
+After `npm run build`, start `npm run preview` in another terminal. The browser checks use Playwright as an optional verification tool, not an application dependency:
+
+```bash
+npm install --prefix /tmp/tradeborn-checks playwright@1.65.0
+NODE_PATH=/tmp/tradeborn-checks/node_modules node scripts/verify-browser.cjs
+```
+
+Chromium defaults to `/usr/bin/chromium`. Override `CHROMIUM_PATH` for your installation and `BASE_URL` for a different local preview server. The runner checks every route at seven widths, internal navigation and anchors, keyboard controls, expanded states, demo calculations, form validation and browser history. No real enquiry is submitted.
+
+`/unknown-page` shows an in-app not-found screen. The static hosting rewrite still serves the SPA entry point with HTTP 200; a true server-side HTTP 404 would require host-specific routing configuration.
+
+## Motion and route behavior
+
+The motion layer uses the existing `motion/react` package. It adds a finite home entrance, one-time scroll reveals, SVG path drawing, panel transitions and input-driven chart inspection. Magnetic CTA movement is limited to three pixels and enabled only for a mouse with a fine pointer. There are no animation loops, market feeds or additional runtime dependencies.
+
+`prefers-reduced-motion` disables entrance movement, magnetic effects, chart interpolation and disclosure animation. Controls and content remain available immediately. Closing animated panels become inert while their exit completes.
+
+`useSiteNavigation` keeps the History API router, intercepts ordinary internal-link clicks and records scroll positions per history entry. Modified clicks retain browser behavior. Route changes mount one active main region and move keyboard focus there; browser back/forward restores the saved position. Header thresholds prevent expand/shrink feedback near a focused control.
+
+Run the additional motion checks against the production preview:
+
+```bash
+NODE_PATH=/tmp/tradeborn-checks/node_modules node scripts/verify-motion.cjs
+```
+
+These checks cover all ten pages with motion enabled and reduced at mobile and desktop sizes, finite animations, stable hero dimensions, cumulative layout shift, mouse/touch chart inspection, disclosure exits, keyboard controls and history/fragment restoration.

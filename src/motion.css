@@ -1,0 +1,60 @@
+/* Finite, input-driven motion. Resting pages have no animation loops. */
+/* The router owns entry restoration; header and disclosure resizing must not re-anchor it. */
+.site { overflow-anchor: none; }
+.hero-line { display: block; overflow: clip; overflow-clip-margin: .05em; }
+.hero-line > span { display: block; }
+.hero-kicker { animation: technical-arrival .5s .05s both; }
+.site-header .brand-mark span { transform-origin: center bottom; animation: brand-arrival .65s cubic-bezier(.22,1,.36,1) both; }
+.site-header .brand-mark span:nth-child(2) { animation-delay: .06s; }
+.site-header .brand-mark span:nth-child(3) { animation-delay: .12s; }
+.desktop-nav button { position: relative; animation: technical-arrival .5s both; }
+.desktop-nav button:nth-child(2) { animation-delay: .04s; }
+.desktop-nav button:nth-child(3) { animation-delay: .08s; }
+.desktop-nav button:nth-child(4) { animation-delay: .12s; }
+.desktop-nav button:nth-child(5) { animation-delay: .16s; }
+.desktop-nav button::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 1px; background: #6d844d; transform: scaleX(0); transform-origin: left; transition: transform .24s ease; }
+.desktop-nav button:hover::after, .desktop-nav button:focus-visible::after { transform: scaleX(1); }
+.nav-active-indicator { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--lime); }
+.journey-number { transition: background-color .22s, color .22s, border-color .22s; }
+.motion-collapse { overflow: hidden; }
+.route-link svg, .text-link svg, .pill-arrow svg, .nav-contact svg, .market-stack svg { transition: transform .25s cubic-bezier(.22,1,.36,1); }
+.route-link:hover svg, .route-link:focus-visible svg, .text-link:hover svg, .nav-contact:hover svg, .market-stack a:hover svg { transform: translate(2px,-2px); }
+.pill-link:hover .pill-arrow svg, .pill-link:focus-visible .pill-arrow svg { transform: rotate(45deg); }
+.pill-link:active, .giant-arrow:active { filter: brightness(.94); }
+.service-entry > button .service-title { transition: color .25s; }
+:is(.service-entry,.journey-timeline,.legal-item) button > svg { transition: transform .28s cubic-bezier(.22,1,.36,1); }
+:is(.service-entry,.journey-timeline,.legal-item) button:hover { color: var(--lime); }
+:is(.method-track,.instrument-selector,.scenario-tabs) button { transition: color .2s, background-color .2s, border-color .2s; }
+.form-field :is(input,select,textarea) { transition: border-color .2s, background-color .2s; }
+.form-field :is(input,select,textarea):focus { background: #131d0e; }
+.form-field label { transition: color .2s; }
+.form-field:focus-within label { color: var(--lime); }
+.form-submit { transition: background-color .2s; }
+.form-submit:active { transform: translateY(1px); }
+.interactive-report { position: relative; }
+.interactive-report svg { cursor: crosshair; touch-action: pan-y; }
+.observation-tooltip { position: absolute; right: 12px; top: 5px; pointer-events: none; display: grid; gap: 4px; padding: 10px 14px; background: #182211f5; border: 1px solid #536d3e; color: var(--lime); box-shadow: 0 6px 18px #0003; }
+.observation-tooltip > span { font: 10px/1.5 var(--mono); letter-spacing: .03em; }
+.observation-tooltip strong { font: 500 24px/1.2 var(--font-display); }
+.chart-grid, .chart-axis { animation: grid-arrival .6s ease-out both; }
+.demo-table[open] .table-scroll { animation: technical-arrival .25s ease-out; }
+@keyframes brand-arrival { from { transform: scaleY(.35); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
+@keyframes technical-arrival { from { opacity: 0; } to { opacity: 1; } }
+@keyframes grid-arrival { from { opacity: .3; } to { opacity: 1; } }
+@media (hover: none), (pointer: coarse) {
+  .pill-link:hover, .giant-arrow:hover { transform: none; }
+  .interactive-report svg { cursor: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .hero-line { overflow: visible; }
+  .route-link:hover svg, .route-link:focus-visible svg, .text-link:hover svg, .nav-contact:hover svg, .market-stack a:hover svg,
+  .pill-link:hover, .pill-link:hover .pill-arrow svg, .pill-link:focus-visible .pill-arrow svg, .giant-arrow:hover, .form-submit:active, .line-cta:hover svg { transform: none; }
+}
+
+.editorial-mask { display: block; overflow: clip; overflow-clip-margin: .06em; }
+.editorial-mask > span { display: block; }
+.instrument-figure .chart-line { transition: stroke-width .2s; }
+.instrument-figure:hover .chart-line { stroke-width: 3.25; }
+@media (prefers-reduced-motion: reduce) { .editorial-mask { overflow: visible; } }
